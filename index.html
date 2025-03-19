@@ -5,18 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nowhere House</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Eater&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Chicle&display=swap');
 
     body {
       margin: 0;
       padding: 0;
-      font-family: "Eater", serif;
+      font-family: "chicle", serif;
       /* background: url(https://i.etsystatic.com/18279207/r/il/ffecdf/5021762033/il_570xN.5021762033_slp7.jpg)
         no-repeat center center fixed; */
       background-size: cover;
       min-height: 100vh;
       color: white;
-      background-color: rgba(25,50,127)
+      /* background-color: rgba(25,50,127) */
+      background-image: url(bg.png);
     }
 
     ::-webkit-scrollbar{
@@ -56,8 +57,8 @@
       transition: letter-spacing 0.3s ease, text-shadow 0.3s ease, color 0.3s ease;
     }
     .navbar .menu a:hover {
-      color: rgb(12, 83, 3);
-      text-shadow: 0 0 15px rgb(43, 161, 27);
+      color: rgba(27,69,215);
+      text-shadow: 0 0 15px rgba(27,69,215);;
       letter-spacing: 2px;
     }
 
@@ -71,37 +72,53 @@
       display: block;
     }
     /* Center content for all pages except the Play page */
-    .page-container.active:not(#play) {
+    .page-container.active{
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: calc(100vh - 60px);
       text-align: center;
     }
 
-    button {
-      background-color: rgba(27,69,215);
-      border-radius: 30px;
-      padding: 30px;
-      font-size: 25px;
-      color: white;
-      border: none;
-      font-family: "Eater", serif;
-      opacity: 1;
-    }
+    .play.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100vh; /* Changed from 75vh to full viewport height */
+}
 
+#grp-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Increased gap for better spacing */
+    background-color: rgba(102, 29, 236, 0.829);
+    padding: 30px; /* Added padding */
+    border-radius: 15px; /* Added rounded corners */
+    width: auto; /* Let content determine width */
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-radius: 30px;
+    padding: 20px 80px; /* Reduced horizontal padding */
+    font-size: 25px;
+    color: white;
+    font-family: "Eater", serif;
+    transition: all 0.3s ease; /* Added smooth transitions */
+}
     button:hover{
-        opacity: 0.5;
-        transition: ease;
+        color: rgba(27,69,215);
+        transform: scale(1.05);
     }
-
 
     p{
         margin-left: 200px;
         margin-right: 200px;
-        font-size: 25px;
-        background-color: rgba(57, 0, 189, 0.568);
+        font-size: 35px;
+        background-color: rgba(76, 0, 255, 0.2);
         border-radius: 40px;
     }
   </style>
@@ -123,13 +140,20 @@
     <h2>WELCOME SOLO PLAYER</h2>
     <p>Welcome to the enchanting world of Soloer, a captivating 2D pixelated RPG where you embark on an epic journey as a lone hero battling fierce monsters and uncovering hidden treasures. In this immersive adventure, you’ll experience the thrill of solo combat, strategic gameplay, and character progression as you navigate through beautifully crafted pixel art environments.</p>
     <!-- Play button added in the center of the Home page -->
-    <button id="home-play-btn">
-      START GAME
+    <button id="home-play-btn" style="font-size: 50px;">
+        PLAY
     </button>
   </div>
 
-  <div id="play" class="page-container">
-    <h2>Play Page</h2>
+  <div id="play" class="page-container play">
+    <div class="grp-btn">
+    <button id="start-game">START</button>
+    <button id="settings-btn">SETTINGS</button>
+    </div>
+  </div>
+
+  <div id="game" class="page-container">
+    <h2>Game Page</h2>
     <p>This is the play page content.</p>
   </div>
 
@@ -181,6 +205,10 @@
     document.getElementById('home-play-btn').addEventListener('click', function(e) {
       e.preventDefault();
       window.location.hash = 'play';
+    });
+    document.getElementById('start-game').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.hash = 'game';
     });
   </script>
 </body>
