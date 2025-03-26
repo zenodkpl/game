@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hitman: The Complete Mission</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #111;
+      color: #eee;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    #game-container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 2px solid #444;
+      border-radius: 10px;
+      background: #222;
+      box-shadow: 0 0 10px #000;
+    }
+    #dialogue {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      min-height: 100px;
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+    }
+    .character {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    #choices {
+      margin-top: 20px;
+    }
+    .choice-btn {
+      background: #444;
+      border: none;
+      color: #eee;
+      padding: 10px 15px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    .choice-btn:hover {
+      background: #666;
+    }
+    #next-btn {
+      background: #0066cc;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 1em;
+      transition: background 0.3s;
+    }
+    #next-btn:hover {
+      background: #005bb5;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h1>Hitman: The Complete Mission</h1>
+    <div id="dialogue"></div>
+    <div id="choices"></div>
+    <button id="next-btn" style="display:none;">Next</button>
+  </div>
+
+  <script>
+    // Story nodes represent each segment of the story.
+    const storyNodes = {
+      1: {
+        character: "Narrator",
+        text: "In the darkest corners of the city, I was forged in silence and shadows. Trained from a young age, I learned that every life I touched was part of my destiny.",
+        next: 2
+      },
+      2: {
+        character: "Handler",
+        text: "You've proven yourself, but your next mission is the most critical yet. Meet me at the abandoned warehouse at midnight.",
+        next: 3
+      },
+      3: {
+        character: "Hitman",
+        text: "The night is cold and the streets are empty as I head to the rendezvous. My mind is sharp, and my instincts, sharper.",
+        next: 4
+      },
+      4: {
+        character: "Narrator",
+        text: "Upon arrival, the warehouse looms before me—a relic of forgotten times. I step inside, prepared for anything.",
+        next: 5
+      },
+      5: {
+        character: "Enemy 1",
+        text: "Halt! Who enters my domain? This territory is under my control.",
+        choices: [
+          { text: "I’m just passing by.", next: 6 },
+          { text: "Step aside, or face the consequences.", next: 7 }
+        ]
+      },
+      6: {
+        character: "Hitman",
+        text: "I offer no pleasantries. My purpose is singular.",
+        next: 8
+      },
+      7: {
+        character: "Hitman",
+        text: "Step aside, or face the consequences.",
+        next: 8
+      },
+      8: {
+        character: "Enemy 1",
+        text: "So be it! You leave me no choice.",
+        choices: [
+          { text: "Engage in combat", next: 9 }
+        ]
+      },
+      9: {
+        character: "Narrator",
+        text: "A fierce exchange ensues as I take down Enemy 1. The battle is brief; his arrogance is his downfall.",
+        next: 10
+      },
+      10: {
+        character: "Enemy 2",
+        text: "You dare intrude here? I guard these halls with my life!",
+        choices: [
+          { text: "I'm on a mission. Stand down.", next: 11 },
+          { text: "Let's settle this like warriors.", next: 12 }
+        ]
+      },
+      11: {
+        character: "Enemy 2",
+        text: "Then prepare to be tested!",
+        choices: [
+          { text: "Engage in combat", next: 13 }
+        ]
+      },
+      12: {
+        character: "Hitman",
+        text: "There's no time for talk. I have a mission to complete.",
+        next: 11
+      },
+      13: {
+        character: "Narrator",
+        text: "The clash with Enemy 2 is relentless. Every move is calculated until, finally, he falls.",
+        next: 14
+      },
+      14: {
+        character: "Enemy 3",
+        text: "I warned you—this ends here, assassin!",
+        choices: [
+          { text: "Your reign is over.", next: 15 },
+          { text: "I don't negotiate with traitors.", next: 15 }
+        ]
+      },
+      15: {
+        character: "Enemy 3",
+        text: "Then, let fate decide our outcome!",
+        choices: [
+          { text: "Engage in combat", next: 16 }
+        ]
+      },
+      16: {
+        character: "Narrator",
+        text: "In a final, brutal encounter, I face Enemy 3. Every second is a dance with death, but my resolve never wavers.",
+        next: 17
+      },
+      17: {
+        character: "Narrator",
+        text: "With the final blow, Enemy 3 crumples to the ground. The silence returns, and I stand alone amidst the echoes of battle.",
+        next: 18
+      },
+      18: {
+        character: "Hitman",
+        text: "Mission accomplished. I vanish into the night, leaving behind a legacy of shadows.",
+        end: true
+      }
+    };
+
+    const dialogueEl = document.getElementById("dialogue");
+    const choicesEl = document.getElementById("choices");
+    const nextBtn = document.getElementById("next-btn");
+    
+    let currentNode = storyNodes[1];
+
+    function showNode(node) {
+      // Reset opacity for animation effect
+      dialogueEl.style.opacity = 0;
+      
+      // Update the dialogue display with character name and text
+      dialogueEl.innerHTML = `<span class='character'>${node.character}:</span> ${node.text}`;
+      
+      // Fade-in animation
+      setTimeout(() => {
+        dialogueEl.style.opacity = 1;
+      }, 100);
+      
+      // Clear previous choices
+      choicesEl.innerHTML = "";
+      
+      // If there are choices, hide the Next button and show the choices
+      if (node.choices) {
+        nextBtn.style.display = "none";
+        node.choices.forEach(choice => {
+          const btn = document.createElement("button");
+          btn.classList.add("choice-btn");
+          btn.textContent = choice.text;
+          btn.addEventListener("click", () => {
+            currentNode = storyNodes[choice.next];
+            showNode(currentNode);
+          });
+          choicesEl.appendChild(btn);
+        });
+      } else if (node.end) {
+        // If the node marks the end, hide Next button and display a closing message
+        nextBtn.style.display = "none";
+        choicesEl.innerHTML = "<p>The mission is complete.</p>";
+      } else {
+        // Otherwise, show the Next button to continue the story
+        nextBtn.style.display = "inline-block";
+      }
+    }
+
+    nextBtn.addEventListener("click", () => {
+      if (currentNode.next) {
+        currentNode = storyNodes[currentNode.next];
+        showNode(currentNode);
+      }
+    });
+
+    // Start the story from the first node
+    showNode(currentNode);
+  </script>
+</body>
+</html>
