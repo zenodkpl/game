@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soloer</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Chicle&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "chicle", serif;
+      background-size: cover;
+      height: 100%;
+      width: 100%;
+      color: white;
+      background-image: url(https://i.pinimg.com/736x/f8/d2/4a/f8d24a3aabc0d8095c712d70afa549fe.jpg);
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Navigation bar that appears on every page */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      box-sizing: border-box;
+      z-index: 1000;
+    }
+    .navbar h1 {
+      font-size: 40px;
+      letter-spacing: 2px;
+      margin: 0;
+      font-family: "chicle", serif;
+      color: rgb(236, 220, 220);
+    }
+    .navbar .menu {
+      margin-left: auto;
+      display: flex;
+    }
+    .navbar .menu a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: rgb(236, 220, 220);
+      font-size: 25px;
+      font-weight: bold;
+      transition: letter-spacing 0.3s ease, text-shadow 0.3s ease, color 0.3s ease;
+    }
+    .navbar .menu a:hover {
+      color: rgb(214, 214, 214);
+      text-shadow: 0 0 15px rgba(214,214,214);
+      letter-spacing: 2px;
+    }
+
+    /* Page container styling */
+    .page-container {
+      display: none;
+      font-size: 25px;
+      padding: 100px 20px; /* extra top padding for the navbar */
+    }
+    .active {
+      display: block;
+    }
+    /* Center content for all pages except the Play page */
+    .page-container.active {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .play.active {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      height: 100%; /* Full viewport height */
+      width: 100%;
+    }
+
+    #grp-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background-color: rgb(214, 214, 214);
+      padding: 30px;
+      border-radius: 15px;
+      width: auto;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-radius: 30px;
+      padding: 20px 80px;
+      font-size: 25px;
+      color: white;
+      font-family: "Eater", serif;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      color: rgb(214, 214, 214);
+      transform: scale(1.05);
+    }
+
+    #game-container {
+      width: 1000px;
+      height: 600px;
+      margin: 0 auto;
+      position: relative;
+      background: #2a2a2a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    #scene {
+      width: 100%;
+      height: 400px;
+      background: #333;
+      position: relative;
+      transition: background 1s ease;
+    }
+    #dialog-box {
+      width: 100%;
+      height: 300px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    #character {
+      position: absolute;
+      height: 250px;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: opacity 0.5s ease;
+    }
+
+    .fade-in {
+      animation: fadeIn 1s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .gallery-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      }
+      .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+      }
+      .gallery-item img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      }
+      .gallery-item:hover {
+      transform: scale(1.05);
+      }
+      .gallery-item:hover img {
+      transform: scale(1.1);
+      }
+      .gallery-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      }
+      .gallery-item:hover .gallery-caption {
+      transform: translateY(0);
+      }
+
+      .team-title {
+      color: #fff;
+      text-shadow: 0 0 10px rgba(214,214,214,0.7);
+    }
+
+    .leader-section{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .team-subtitle {
+      color: #fff;
+      text-shadow: 0 0 8px rgba(255,255,255,0.5);
+    }
+
+    .leader-section {
+      animation: slideIn 1s ease-out;
+    }
+
+    .designer-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: slideIn 1s ease-out 0.3s;
+    }
+
+    .team-member {
+      background: rgba(27,69,215,0.1);
+      border: 2px solid rgba(27,69,215,0.3);
+    }
+
+    .team-member img {
+      filter: brightness(1.1);
+    }
+
+    .team-member .gallery-caption {
+      background: rgba(0,0,0,0.7);
+    }
+
+    .team-member h4 {
+      margin: 0;
+    }
+
+    .team-member p {
+      margin: 5px 0 0;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation bar common to all pages -->
+  <div class="navbar">
+    <h1>SOLOER</h1>
+    <div class="menu">
+      <a href="#" data-target="home">Home</a>
+      <a href="#" data-target="about">Tutorial</a>
+      <a href="#" data-target="gallery">Gallery</a>
+      <a href="#" data-target="contact">Contact</a>
+    </div>
+  </div>
+
+  <!-- Page containers -->
+  <div id="home" class="page-container active">
+    <h2>Welcome to Soloer: A Hitman's Tale</h2>
+    <p>Soloer is an immersive visual novel that puts you in the shoes of a lone hitman on a deadly mission to eliminate three powerful enemies. As you navigate the underworld, every decision you make shapes the outcome of your journey. Will you strike with precision, uncover hidden truths, or fall victim to the dangers lurking in the dark?
+      <br>
+    🕵️‍♂️ Intriguing Storyline – Experience a gripping narrative filled with deception, action, and mystery.
+    <br>
+    🎨 Stunning Visuals – A cinematic experience with beautifully crafted scenes.
+    <br>
+    <br>
+    Are you ready to complete the mission?</p>
+    <!-- Play button added in the center of the Home page -->
+    <button id="home-play-btn" style="font-size: 50px;">PLAY</button>
+  </div>
+
+  <div id="play" class="page-container play">
+    <div id="game-container">
+      <div id="scene">
+        <img id="character">
+      </div>
+      <div id="dialog-box">
+        <p id="text">Welcome to the Visual Novel!</p>
+        <!-- Container for choice buttons -->
+        <div id="choices"></div>
+        <!-- Next button to progress when there are no choices -->
+        <button id="next-btn" onclick="nextScene()">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="about" class="page-container">
+    <h2>How to Play?</h2>
+    <p>
+      Start the Game – Click “Start Game” to begin.
+      <br>
+      Read & Interact – Follow the story and engage with characters.
+      <br>
+      Make Choices – Click the button for your preferred answer. Your choices shape the story.
+      <br>
+      <br>        
+      Now, step into the world of Soloer and complete your mission! 🚀</p>
+  </div>
+
+  <div id="gallery" class="page-container">
+    <h2>Character Gallery</h2>
+    <div class="gallery-container">
+      <div class="gallery-item">
+      <img src="./img/mhm.png" alt="Character 1">
+      <div class="gallery-caption">Main Character</div>
+      </div>
+      <div class="gallery-item">
+      <img src="./img/enemy.png" alt="Character 2">
+      <div class="gallery-caption">Enemy 1</div>
+      </div>
+      <div class="gallery-item">
+      <img src="./img/enemy3.png" alt="Character 3">
+      <div class="gallery-caption">Enemy 2</div>
+      </div>
+      <div class="gallery-item">
+      <img src="./img/enemy4.png" alt="Character 4">
+      <div class="gallery-caption">Enemy 3</div>
+      </div>
+      <div class="gallery-item">
+      <img src="./img/enemy5.png" alt="Character 5">
+      <div class="gallery-caption">Enemy 4</div>
+      </div>
+      <div class="gallery-item">
+      <img src="./img/mhm2.png" alt="Character 6">
+      <div class="gallery-caption">Main Character 2</div>
+      </div>
+      <!-- <h2>Map Gallery</h2> -->
+      <!-- <div class="gallery-container">
+        <div class="gallery-item">
+        <img src="./img/street.jpg" alt="Character 1">
+        <div class="gallery-caption">Street</div>
+        </div>
+        <div class="gallery-item">
+        <img src="./img/street2.jpg" alt="Character 2">
+        <div class="gallery-caption">Street 2</div>
+        </div>
+        <div class="gallery-item">
+        <img src="./img/warehouse.jpg" alt="Character 3">
+        <div class="gallery-caption">Warehouse</div>
+        </div>
+        <div class="gallery-item">
+        <img src="./img/warehouse1.png" alt="Character 4">
+        <div class="gallery-caption">Warehouse 2</div>
+        </div>
+        </div> -->
+    </div>
+    </div>
+
+  <div id="contact" class="page-container">
+    <h2 class="team-title">Our Team</h2>
+    
+    <h3 class="team-subtitle">Lead Developer</h3>
+    <div class="gallery-container leader-section">
+      <div class="gallery-item team-member">
+        <img src="./img/dev.jpg" alt="Lead Leader">
+        <div class="gallery-caption">
+          <h4>Piniel Viola</h4>
+          <p></p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="team-subtitle">Designers</h3>
+    <div class="gallery-container designer-section">
+      <div class="gallery-item team-member">
+        <img src="./img/des1.jpg" alt="Designer 1">
+        <div class="gallery-caption">
+          <h4>Kevin Celis</h4>
+        </div>
+      </div>
+      <div class="gallery-item team-member">
+        <img src="./img/des2.png" alt="Designer 2">
+        <div class="gallery-caption">
+          <h4>Ed Gabriel Abujen</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Story nodes representing each segment of the story.
+    // Added characterImage and background properties where needed.
+    const storyNodes = {
+      1: {
+        character: "Narrator",
+        text: "In the darkest corners of the city, I was forged in silence and shadows. Trained from a young age, I learned that every life I touched was part of my destiny.",
+        background: "./img/street2.jpg",
+        next: 2
+      },
+      2: {
+        character: "Handler",
+        text: "You've proven yourself, but your next mission is the most critical yet. Meet me at the abandoned warehouse at midnight.",
+        background: "./img/warehouse.jpg",
+        next: 3
+      },
+      3: {
+        character: "Hitman",
+        text: "The night is cold and the streets are empty as I head to the rendezvous. My mind is sharp, and my instincts, sharper.",
+        background: "./img/street.jpg",
+        characterImage: "./img/mhm.png",
+        next: 4
+      },
+      4: {
+        character: "Narrator",
+        text: "Upon arrival, the warehouse looms before me—a relic of forgotten times. I step inside, prepared for anything.",
+        background: "./img/warehouse.jpg",
+        next: 5
+      },
+      5: {
+        character: "Enemy 1",
+        text: "Halt! Who enters my domain? This territory is under my control.",
+        background: "./img/warehouse.jpg",
+        characterImage: "./img/enemy.png",
+        choices: [
+          { text: "I’m just passing by.", next: 6 },
+          { text: "Step aside, or face the consequences.", next: 7 }
+        ]
+      },
+      6: {
+        character: "Hitman",
+        text: "I offer no pleasantries. My purpose is singular.",
+        background: "./img/warehouse.jpg",
+        characterImage: "./img/mhm2.png",
+        next: 8
+      },
+      7: {
+        character: "Hitman",
+        text: "Step aside, or face the consequences.",
+        background: "./img/warehouse.jpg",
+        characterImage: "./img/mhm2.png",
+        next: 8
+      },
+      8: {
+        character: "Enemy 1",
+        text: "So be it! You leave me no choice.",
+        background: "./img/warehouse.jpg",
+        characterImage: "./img/enemy.png",
+        choices: [
+          { text: "Engage in combat", next: 9 }
+        ]
+      },
+      9: {
+        character: "Narrator",
+        text: "A fierce exchange ensues as I take down Enemy 1. The battle is brief; his arrogance is his downfall.",
+        background: "./img/warehouse.jpg",
+        next: 10
+      },
+      10: {
+        character: "Enemy 2",
+        text: "You dare intrude here? I guard these halls with my life!",
+        background: "./img/warehouse.jpg",
+        characterImage: "./img/enemy5.png",
+        choices: [
+          { text: "I'm on a mission. Stand down.", next: 11 },
+          { text: "Let's settle this like warriors.", next: 12 }
+        ]
+      },
+      11: {
+        character: "Enemy 2",
+        text: "Then prepare to be tested!",
+        characterImage: "./img/enemy4.png",
+        background: "./img/warehouse.jpg",
+        choices: [
+          { text: "Engage in combat", next: 13 }
+        ]
+      },
+      12: {
+        character: "Hitman",
+        text: "There's no time for talk. I have a mission to complete.",
+        background: "./img/warehouse.jpg",
+        characterImage: "./img/mhm2.png",
+        next: 11
+      },
+      13: {
+        character: "Narrator",
+        text: "The clash with Enemy 2 is relentless. Every move is calculated until, finally, he falls.",
+        background: "./img/warehouse.jpg",
+        next: 14
+      },
+      14: {
+        character: "Enemy 3",
+        text: "I warned you—this ends here, assassin!",
+        background: "./img/warehouse.jpg",
+        characterImage: "./img/enemy3.png",
+        choices: [
+          { text: "Your reign is over.", next: 15 },
+          { text: "I don't negotiate with traitors.", next: 15 }
+        ]
+      },
+      15: {
+        character: "Enemy 3",
+        text: "Then, let fate decide our outcome!",
+        background: "./img/warehouse.jpg",
+        characterImage: "./img/enemy3.png",
+        choices: [
+          { text: "Engage in combat", next: 16 }
+        ]
+      },
+      16: {
+        character: "Narrator",
+        text: "In a final, brutal encounter, I face Enemy 3. Every second is a dance with death, but my resolve never wavers.",
+        background: "./img/warehouse.jpg",
+        next: 17
+      },
+      17: {
+        character: "Narrator",
+        text: "With the final blow, Enemy 3 crumples to the ground. The silence returns, and I stand alone amidst the echoes of battle.",
+        background: "./img/warehouse1.png",
+        next: 18
+      },
+      18: {
+        character: "Hitman",
+        text: "Mission accomplished. I vanish into the night, leaving behind a legacy of shadows.",
+        background: "./img/warehouse1.png",
+        characterImage: "./img/mhm.png",
+        end: true
+      }
+    };
+
+    // Current node starts at 1
+    let currentNode = 1;
+    const textElement = document.getElementById("text");
+    const choicesContainer = document.getElementById("choices");
+    const nextBtn = document.getElementById("next-btn");
+    const sceneElement = document.getElementById("scene");
+    const characterElement = document.getElementById("character");
+
+    // Update the scene based on the current node
+    function updateScene() {
+      // Restart the fade-in animation for text
+      textElement.classList.remove("fade-in");
+      void textElement.offsetWidth; // Trigger reflow
+      textElement.classList.add("fade-in");
+
+      // Get current node data
+      let node = storyNodes[currentNode];
+      // Update dialogue text with character and message
+      textElement.innerHTML = `<span class="character">${node.character}:</span> ${node.text}`;
+
+      // Clear previous choices and update Next button visibility
+      choicesContainer.innerHTML = "";
+      if (node.choices) {
+        nextBtn.style.display = "none";
+        node.choices.forEach(choice => {
+          let btn = document.createElement("button");
+          btn.textContent = choice.text;
+          btn.addEventListener("click", () => {
+            currentNode = choice.next;
+            updateScene();
+          });
+          choicesContainer.appendChild(btn);
+        });
+      } else {
+        nextBtn.style.display = "inline-block";
+      }
+
+      // Update background image or color if provided
+      if (node.background) {
+        if (node.background.startsWith("#")) {
+          sceneElement.style.background = node.background;
+          sceneElement.style.backgroundImage = "";
+        } else {
+          sceneElement.style.backgroundImage = `url(${node.background})`;
+          sceneElement.style.backgroundSize = 'cover';
+          sceneElement.style.backgroundPosition = 'center';
+        }
+      } else {
+        // Fallback background
+        sceneElement.style.background = "#333";
+        sceneElement.style.backgroundImage = "";
+      }
+
+      // Update character image if provided, else use default image
+      if (node.characterImage) {
+        characterElement.src = node.characterImage;
+      } else {
+        characterElement.src = "https://via.placeholder.com/200x300";
+      }
+
+      // Animate the character's opacity for a fade effect
+      characterElement.style.opacity = 0;
+      setTimeout(() => {
+        characterElement.style.opacity = 1;
+      }, 500);
+    }
+
+    // Function to progress to the next node
+    function nextScene() {
+      let node = storyNodes[currentNode];
+      // If the node has choices, do nothing as choices will handle progression.
+      if (node.choices) return;
+      // If the current node marks the end, finish the mission.
+      if (node.end) {
+        textElement.innerHTML += "<br><em>The mission is complete.</em>";
+        nextBtn.style.display = "none";
+        return;
+      }
+      // Move to the next node defined in the current node.
+      if (node.next) {
+        currentNode = node.next;
+        updateScene();
+      }
+    }
+
+    // Navigation functionality to display the correct page based on URL hash
+    function showPageFromHash() {
+      const hash = window.location.hash.substring(1) || "home";
+      document.querySelectorAll('.page-container').forEach(page => {
+        page.classList.remove('active');
+      });
+      const targetElement = document.getElementById(hash);
+      if (targetElement) {
+        targetElement.classList.add('active');
+      }
+    }
+
+    // Update page on load and when the hash changes
+    window.addEventListener('load', showPageFromHash);
+    window.addEventListener('hashchange', showPageFromHash);
+
+    // Navigation link event listeners update the URL hash
+    const navLinks = document.querySelectorAll('.menu a');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('data-target');
+        window.location.hash = targetId;
+      });
+    });
+
+    // Play button on the Home page sets the hash to 'play'
+    document.getElementById('home-play-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.hash = 'play';
+      // Start the visual novel from the first node when the play page is loaded
+      currentNode = 1;
+      updateScene();
+    });
+  </script>  
+</body>
+</html>
